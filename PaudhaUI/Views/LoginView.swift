@@ -1,13 +1,14 @@
 import SwiftUI
+import FirebaseAuth
+import Firebase
 
 struct LoginView: View {
     @State private var isLogged = false // Add a state variable for navigation
     @State private var email = ""
     @State private var password = ""
     @State private var firstName = ""
-    @State private var lastName = ""
 
-    var body: some View {
+    var content: some View {
         NavigationView {
             ZStack {
                 Color(red: 244/255, green: 241/255, blue: 222/255)
@@ -41,7 +42,8 @@ struct LoginView: View {
                         Button(action: {
                             // Add your login authentication logic here
                             // For demonstration purposes, set isLogged to true
-                            isLogged = true
+                            login()
+                           
                         }) {
                             Text("Login")
                                 .font(.headline)
@@ -55,6 +57,7 @@ struct LoginView: View {
                                         .stroke(Color( red: 0.2, green: 0.2, blue: 0.2).opacity(0.4), lineWidth: 2)
                                 )
                         }
+
 
 
                         HStack(spacing: 0) {
@@ -85,13 +88,37 @@ struct LoginView: View {
             })
         }.navigationBarBackButtonHidden(true)
     }
+    
+    var body: some View{
+        if isLogged {
+            //go to home page
+            PaudhaTabView()
+        }
+        else {
+            content
+        }
+    }
+    
+    func login(){
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+            if let error = error {
+                print("Error logging in: \(error.localizedDescription)")
+            } else {
+                // Successfully logged in
+                isLogged = true // Set isLogged to true to trigger navigation
+                print("User successfully logged in!")
+            }
+        }
+    }
+
+    
 }
 
 struct SignupView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var firstName = ""
-    @State private var lastName = ""
+  
 
     var body: some View {
         NavigationView {
@@ -116,11 +143,7 @@ struct SignupView: View {
                         TextField("First Name", text: $firstName) // Changed from email to firstName
                             .padding()
                             .background(Color.white)
-                            .cornerRadius(200.0)
-                        TextField("Last Name", text: $lastName) // Changed from email to lastName
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(200.0)
+                            .cornerRadius(200.0) 
                         TextField("Email", text: $email)
                             .padding()
                             .background(Color.white)
@@ -133,6 +156,7 @@ struct SignupView: View {
 
                         Button(action: {
                             // Add your signup authentication logic here
+                            register()
                         }) {
                             Text("Signup") // Changed from "Login" to "Signup"
                                 .font(.headline)
@@ -158,6 +182,15 @@ struct SignupView: View {
             }
         }
     }
+    
+    func register(){
+        Auth.auth().createUser(withEmail: email, password: password){ result, error in
+            if error != nil {
+                print(error!.localizedDescription)
+            }
+        }
+    }
+    
 }
 struct LogoButton: View {
     var imageName: String

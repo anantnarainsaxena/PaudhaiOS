@@ -6,9 +6,16 @@
 //
 
 import SwiftUI
+import Firebase
+
+
 
 @main
 struct PaudhaUIApp: App {
+    
+    init(){
+        FirebaseApp.configure()
+    }
     var body: some Scene {
         WindowGroup {
             ContentView()
