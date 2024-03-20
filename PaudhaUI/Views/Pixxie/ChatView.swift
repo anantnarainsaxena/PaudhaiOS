@@ -1,12 +1,12 @@
 
-
+//api=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
 import SwiftUI
 
 struct ChatView: View {
     @State private var messageText = ""
     @State private var messages: [String] = ["Welcome to PetalPixxie"]
     
-    let apiKey = "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"
+    let apiKey = ""
     let endpoint = "https://api.openai.com/v1/chat/completions"
 
     var body: some View {
