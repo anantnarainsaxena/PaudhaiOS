@@ -1,8 +1,8 @@
 //
-//  PageModel.swift
+//  Page.swift
 //  PaudhaUI
 //
-//  Created by user1 on 05/03/24.
+//  Created by user1 on 23/03/24.
 //
 
 import Foundation

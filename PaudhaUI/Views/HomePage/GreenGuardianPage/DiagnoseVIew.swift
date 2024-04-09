@@ -1,23 +1,14 @@
 //
-//  Identify.swift
+//  DiagnoseVIew.swift
 //  PaudhaUI
 //
-//  Created by Anant Narain on 16/01/24.
+//  Created by user1 on 27/03/24.
 //
-
-//
-//  Identify.swift
-//  Paudha
-//
-//  Created by user 1 an on 18/12/23.
-//
-
-
 import SwiftUI
 import CoreML
 import Vision
 
-struct Identify: View {
+struct DiagnoseView: View {
     @State private var classificationLabel: String = ""
     @State private var healthClassificationLabel: String = ""
     @State private var selectedImage: UIImage?
@@ -25,32 +16,24 @@ struct Identify: View {
     @State private var isDetailsPresented = false
     @State private var selectedDetailCategory = ""
     @State private var selectedPlantName = "" // Default plant name
-    let detailCategories = ["Watering", "Sunlight", "Nutrients"]
+    let detailCategories = ["Symptoms", "Causes", "Preventive Measures","Necessary Actions"]
     let identifyConfiguration = MLModelConfiguration()
     let healthConfiguration = MLModelConfiguration()
     
     // Initialize Identify model
-    var identifyModel: PaudhaIdentifyModel? = {
+    var identifyModel: DiseaseAna? = {
         do {
-            return try PaudhaIdentifyModel(configuration: MLModelConfiguration())
+            return try DiseaseAna(configuration: MLModelConfiguration())
         } catch {
             fatalError("Failed to initialize Identify model. Error: \(error)")
         }
     }()
     
-    // Initialize Health model
-    var healthModel: HealthAna? = {
-        do {
-            return try HealthAna(configuration: MLModelConfiguration())
-        } catch {
-            fatalError("Failed to initialize Health model. Error: \(error)")
-        }
-    }()
     
     var body: some View {
         VStack {
             // Image card
-            ZStack(alignment: .top) {
+            ZStack {
                 RoundedRectangle(cornerRadius: 40)
                     .fill(Color.gray.opacity(0.4))
                     .frame(width: 360, height: 280)
@@ -87,8 +70,8 @@ struct Identify: View {
                 }
                 
                 Button(action: {
-                    self.classifyImage()
-                    self.healthClassifyImage() // Call health classification
+                    self.DiagnoseImage()
+ // Call health classification
                 }) {
                     Text("Classify")
                         .foregroundColor(.white)
@@ -110,16 +93,10 @@ struct Identify: View {
                             .padding(.horizontal)
                     }
                     
-                    if !healthClassificationLabel.isEmpty {
-                        Text("\(healthClassificationLabel)")
-                            .padding()
-                            .foregroundColor(.black)
-                            .cornerRadius(10)
-                            .padding(.horizontal)
-                    }
+                    
                 }
-                .frame(width: 360, height: 90)
                 .padding()
+                .frame(width: 360, height: 90)
                 .background(Color.gray.opacity(0.2)) // Background color
                 .cornerRadius(10) // Rounded corners
                 .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Shadow
@@ -135,7 +112,7 @@ struct Identify: View {
                 Divider()
                 
                 ForEach(detailCategories, id: \.self) { category in
-                    DetailRow(title: category) {
+                    diaDetailRow(title: category) {
                         self.selectedDetailCategory = category
                         self.isDetailsPresented = true
                     }
@@ -147,51 +124,14 @@ struct Identify: View {
             .padding()
         }
         .sheet(isPresented: $isDetailsPresented) {
-            IdentifyDetailSheet(plantName: self.selectedPlantName, detailCategory: self.selectedDetailCategory)
+            DisDetailSheet(diseaseName: self.selectedPlantName, detailCategory: self.selectedDetailCategory)
         }
     }
     
-    private func healthClassifyImage() {
-        guard let model = healthModel, let selectedImage = selectedImage else {
-            print("Model or selected image is nil.")
-            return
-        }
-        
-        print("Selected image size: \(selectedImage.size)")
-        
-        guard let resizedImage = selectedImage.resizeImageTo(size: CGSize(width: 299, height: 299)) else {
-            print("Error resizing the image.")
-            return
-        }
-        
-        print("Resized image size: \(resizedImage.size)")
-        
-        guard let buffer = resizedImage.convertToBuffer() else {
-            print("Error converting the image to buffer.")
-            return
-        }
-        
-        do {
-            let output = try model.prediction(image: buffer)
-            guard let topPrediction = output.targetProbability.max(by: { $0.value < $1.value }) else {
-                self.healthClassificationLabel = "Unable to determine"
-                print("Unable to determine")
-                return
-            }
-            
-            let classification = "\(topPrediction.key) = \(String(format: "%.2f%%", topPrediction.value * 100))"
-            self.healthClassificationLabel = classification
-            
-            print("Top Prediction: \(topPrediction.key), Probability: \(String(format: "%.2f%%", topPrediction.value * 100))")
-            print("Classification Label: \(classification)")
-        } catch {
-            print("Error during prediction: \(error)")
-            self.healthClassificationLabel = "Error during prediction"
-        }
-    }
+   
     
     
-    private func classifyImage() {
+    private func DiagnoseImage() {
         guard let model = identifyModel, let selectedImage = selectedImage else {
             print("Model or selected image is nil.")
             return
@@ -233,7 +173,7 @@ struct Identify: View {
 }
 
 
-struct DetailRow: View {
+struct diaDetailRow: View {
     let title: String
     let onTap: () -> Void
     
@@ -251,41 +191,10 @@ struct DetailRow: View {
     }
 }
 
-struct ImagePicker2: UIViewControllerRepresentable {
-    @Binding var selectedImage: UIImage?
-    @Environment(\.presentationMode) var presentationMode
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
-    }
-    
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: ImagePicker2
-        
-        init(_ parent: ImagePicker2) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let uiImage = info[.originalImage] as? UIImage {
-                parent.selectedImage = uiImage
-            }
-            parent.presentationMode.wrappedValue.dismiss()
-        }
-    }
-}
-struct IdentifyView_Previews: PreviewProvider {
+
+struct DiagnoseView_Previews: PreviewProvider {
     static var previews: some View {
-        Identify()
+        DiagnoseView()
     }
 }
 

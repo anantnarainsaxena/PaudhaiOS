@@ -1,15 +1,32 @@
-//
-//  ReminderStore.swift
-//  REM
-//
-//  Created by SHHH!! private on 05/03/24.
-//
-
-
+import CoreData
 import SwiftUI
 
 class ReminderStore: ObservableObject {
-    @Published var reminders: [Reminder] = []
+    @Published var reminders: [Reminder] = [] {
+        didSet {
+            saveReminders()
+        }
+    }
+    
+    private let remindersKey = "remindersKey"
+
+    init() {
+        loadReminders()
+    }
+
+    private func loadReminders() {
+        if let data = UserDefaults.standard.data(forKey: remindersKey) {
+            if let decoded = try? JSONDecoder().decode([Reminder].self, from: data) {
+                reminders = decoded
+            }
+        }
+    }
+
+    private func saveReminders() {
+        if let encoded = try? JSONEncoder().encode(reminders) {
+            UserDefaults.standard.set(encoded, forKey: remindersKey)
+        }
+    }
 
     func addReminder(reminder: Reminder) {
         reminders.append(reminder)

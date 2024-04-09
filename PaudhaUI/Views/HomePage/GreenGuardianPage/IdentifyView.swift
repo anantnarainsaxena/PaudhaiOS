@@ -1,23 +1,15 @@
 //
-//  Identify.swift
+//  IdentifyView.swift
 //  PaudhaUI
 //
-//  Created by Anant Narain on 16/01/24.
+//  Created by user1 on 27/03/24.
 //
-
-//
-//  Identify.swift
-//  Paudha
-//
-//  Created by user 1 an on 18/12/23.
-//
-
 
 import SwiftUI
 import CoreML
 import Vision
 
-struct Identify: View {
+struct IdentifyView: View {
     @State private var classificationLabel: String = ""
     @State private var healthClassificationLabel: String = ""
     @State private var selectedImage: UIImage?
@@ -50,7 +42,7 @@ struct Identify: View {
     var body: some View {
         VStack {
             // Image card
-            ZStack(alignment: .top) {
+            ZStack {
                 RoundedRectangle(cornerRadius: 40)
                     .fill(Color.gray.opacity(0.4))
                     .frame(width: 360, height: 280)
@@ -118,8 +110,8 @@ struct Identify: View {
                             .padding(.horizontal)
                     }
                 }
-                .frame(width: 360, height: 90)
                 .padding()
+                .frame(width: 360,height: 90)
                 .background(Color.gray.opacity(0.2)) // Background color
                 .cornerRadius(10) // Rounded corners
                 .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Shadow
@@ -251,41 +243,10 @@ struct DetailRow: View {
     }
 }
 
-struct ImagePicker2: UIViewControllerRepresentable {
-    @Binding var selectedImage: UIImage?
-    @Environment(\.presentationMode) var presentationMode
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
-    }
-    
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: ImagePicker2
-        
-        init(_ parent: ImagePicker2) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let uiImage = info[.originalImage] as? UIImage {
-                parent.selectedImage = uiImage
-            }
-            parent.presentationMode.wrappedValue.dismiss()
-        }
-    }
-}
+
 struct IdentifyView_Previews: PreviewProvider {
     static var previews: some View {
-        Identify()
+        IdentifyView()
     }
 }
 

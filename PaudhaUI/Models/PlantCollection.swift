@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+
 class PlantCollection: ObservableObject {
     @Published var plants: [Plant] = []
+    
 }
+

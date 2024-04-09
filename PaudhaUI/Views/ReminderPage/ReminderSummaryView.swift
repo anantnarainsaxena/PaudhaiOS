@@ -1,9 +1,3 @@
-//
-//  ReminderSummaryView.swift
-//  REM
-//
-//  Created by SHHH!! private on 05/03/24.
-//
 import SwiftUI
 struct ReminderSummaryView: View {
     @ObservedObject var reminderStore: ReminderStore
@@ -34,3 +28,4 @@ struct ReminderSummaryView: View {
         return reminderStore.reminders.filter { $0.isCompleted }.count
     }
 }
+

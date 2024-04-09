@@ -10,9 +10,9 @@ import EventKit
 
 struct AddReminderView: View {
     @ObservedObject var reminderStore: ReminderStore
-    @State private var name = ""
+    @State private var name = "Rose" // Initialized with a valid name
     @State private var location = ""
-    @State private var action = "Watering"
+    @State private var action = "Watering" // Initialized with a valid action
     @State private var repeatOptions: [Date] = [Date()]
     @State private var time = Date()
     @State private var lastWatering = Date()
@@ -20,7 +20,6 @@ struct AddReminderView: View {
     @State private var image: UIImage?
     @State private var isReminderAdded = false
     @Environment(\.presentationMode) var presentationMode
-    
     let names = ["Rose", "SnakePlant"]
     let actions = ["Watering", "Misting", "Fertilizing", "Pruning"]
     
@@ -80,14 +79,14 @@ struct AddReminderView: View {
                     presentationMode.wrappedValue.dismiss()
                 },
                 trailing: Button("Add Reminder") {
-                    let newReminder = Reminder(name: self.name, image: self.image, location: self.location, action: self.action, repeatOptions: self.repeatOptions, time: self.time, lastWatering: self.lastWatering)
+                    let newReminder = Reminder(name: self.name, imageData: self.image?.jpegData(compressionQuality: 1.0), location: self.location, action: self.action, repeatOptions: self.repeatOptions, time: self.time, lastWatering: self.lastWatering)
                     self.reminderStore.addReminder(reminder: newReminder)
                     self.isReminderAdded = true
                     self.scheduleNotificationForReminder() // Schedule notification after saving reminder
-//                    self.addReminderToCalendar() // Add reminder to calendar after saving reminder
+                    self.addReminderToCalendar() // Add reminder to calendar after saving reminder
                     self.presentationMode.wrappedValue.dismiss()
                 }
-                    .disabled(isReminderAdded)
+                .disabled(isReminderAdded)
             )
             .onDisappear {
                 // Clean up or additional actions if needed
@@ -110,4 +109,31 @@ struct AddReminderView: View {
         UNUserNotificationCenter.current().add(request)
     }
 
+    func addReminderToCalendar() {
+        let eventStore = EKEventStore()
+        eventStore.requestAccess(to: .reminder) { granted, error in
+            if granted && error == nil {
+                let reminder = EKReminder(eventStore: eventStore)
+                reminder.title = self.name
+                reminder.notes = "Action: \(self.action)\nLocation: \(self.location)"
+
+                let calendar = eventStore.defaultCalendarForNewReminders()
+                reminder.calendar = calendar
+
+                let reminderTime = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: self.time)
+                reminder.dueDateComponents = reminderTime
+
+                do {
+                    try eventStore.save(reminder, commit: true)
+                    DispatchQueue.main.async {
+                        self.isReminderAdded = true
+                    }
+                } catch {
+                    print("Error saving reminder to calendar: \(error.localizedDescription)")
+                }
+            } else {
+                print("Access denied or error: \(error?.localizedDescription ?? "Unknown error")")
+            }
+        }
     }
+}

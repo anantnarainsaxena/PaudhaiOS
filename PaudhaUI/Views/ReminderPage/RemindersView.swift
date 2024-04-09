@@ -10,7 +10,6 @@ import SwiftUI
 struct RemindersView: View {
     @ObservedObject var reminderStore = ReminderStore()
     @State private var isAddReminderSheetPresented = false
-    @State private var isEditing = false
 
     var body: some View {
         NavigationView {
@@ -26,25 +25,17 @@ struct RemindersView: View {
             }
             .scrollContentBackground(.hidden)
             .navigationBarTitle("Reminders")
-            .navigationBarItems(
-                leading: Button(action: {
-                    isEditing.toggle() // Toggle the edit mode
-                }) {
-                    Text(isEditing ? "Done" : "Edit") // Change the button text based on the edit mode state
-                },
-                trailing: Button(action: {
-                    isAddReminderSheetPresented = true
-                }) {
-                    Image(systemName: "plus")
-                }
-            )
+            .navigationBarItems(trailing: Button(action: {
+                isAddReminderSheetPresented = true
+            }) {
+                Image(systemName: "plus")
+            })
             .sheet(isPresented: $isAddReminderSheetPresented) {
                 AddReminderView(reminderStore: reminderStore)
-                    .navigationBarItems(trailing: Button("Cancel") {
-                        isAddReminderSheetPresented = false
-                    })
             }
-            .environment(\.editMode, .constant(isEditing ? EditMode.active : EditMode.inactive)) // Pass edit mode to the environment
+            .onAppear{
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]){ _, _ in }
+            }
         }
     }
 }

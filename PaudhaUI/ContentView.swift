@@ -60,37 +60,7 @@ struct ContentView: View {
                         isUserAuthenticated = true
                     }
                 }
-//        NavigationView {
-//            TabView(selection: $pageIndex) {
-//                ForEach(pages) { page in
-//                    VStack {
-//                        Spacer()
-//                        PageView(page: page)
-//                        Spacer()
-//                        if page == pages.last {
-//                            NavigationLink(destination: LoginView()) {
-//                                Text("Login!")
-//                            }
-//                            .buttonStyle(.bordered)
-//                        } else {
-//                            Button("next", action: incrementPage)
-//                                .buttonStyle(.borderedProminent)
-//                        }
-//                        Spacer()
-//                    }
-//                    .tag(page.tag)
-//                }
-//            }
-//        
-//            .animation(.easeInOut, value: pageIndex)
-//            .indexViewStyle(.page(backgroundDisplayMode: .interactive))
-//            .tabViewStyle(PageTabViewStyle())
-//            .onAppear {
-//                dotAppearance.currentPageIndicatorTintColor = .black
-//                dotAppearance.pageIndicatorTintColor = .gray
-//            }
-//        }.navigationBarBackButtonHidden(true)
-        
+
         
     }
     

@@ -1,10 +1,9 @@
 import SwiftUI
 import UIKit
-
-
+import Firebase
 
 struct Home: View {
- 
+
     @StateObject private var plantCollection = PlantCollection()
     @State private var isAddingBuddy = false
     @State private var isSideMenuPresented = false
@@ -37,7 +36,7 @@ struct Home: View {
                 
                 VStack {
 
-                    
+                    //profile image section
                     ZStack {
                                             // Display selected image or default icon
                                             if let selectedImage = selectedImage {
@@ -78,12 +77,7 @@ struct Home: View {
                 VStack {
                     HStack(spacing: 50) {
                         VStack {
-                            ZStack{
-                                Rectangle()
-                                    .fill(.white)
-                                    .frame(width: 100, height: 100)
-                                    .shadow(color: .black.opacity(0.2), radius: 7, x: 0, y: 0)
-                                    .padding()
+                           
                                 Button(action: {
                                     isAlertPresented = true
                                 }) {
@@ -93,25 +87,22 @@ struct Home: View {
                                         .frame(width: 100, height: 100)
                                         .cornerRadius(10)
                                 }
-                            }
+                            
 
-                            NavigationLink(destination: Identify(), isActive: $isIdentifySelected) {
+                            NavigationLink(destination: IdentifyView(), isActive: $isIdentifySelected) {
                                 EmptyView()
                             }
-                            NavigationLink(destination: Diagnose(), isActive: $isDiagnoseSelected) {
+                            NavigationLink(destination: DiagnoseView(), isActive: $isDiagnoseSelected) {
                                 EmptyView()
                             }
                             Text("Green Guardian")
                         }
                         .padding()
 
-                        
+                        //Add plant section
                         VStack {
-                            ZStack{
-                                Rectangle()
-                                    .fill(.white)
-                                    .frame(width: 100, height: 100)
-                                    .shadow(color: .black.opacity(0.2), radius: 7)
+                           
+
                                 Image("Addimage2")
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
@@ -119,23 +110,22 @@ struct Home: View {
                                     .cornerRadius(10)
                                     .onTapGesture {
                                         isAddingBuddy = true
-                                    }
-                                    .padding()
+                                    
+                                   
                             }
-                            Text("Add new buddy")
+                            Text("Add new plant")
                         }.sheet(isPresented: $isAddingBuddy) {
                             AddBuddyView()
                         }.environmentObject(plantCollection)
                     }
                 }
                 
+                
+                //Quote sections
+                
                     VStack {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 30)
-                                .fill(Color.white)
-                                .opacity(0.2)
-                                .frame(width: 370, height: 120)
-                                .shadow(color: .black, radius: 10, x: 0, y: 0)
+
 
                             VStack {
                                 Text("Daily Dose of Paudha🌱")
@@ -163,6 +153,8 @@ struct Home: View {
                              }
                          }
                 
+
+                //My collections view
                 VStack {
                                                     Text("My Collection")
                                                         .frame(width: 350, alignment: .leading)
@@ -215,7 +207,7 @@ struct Home: View {
                                                         }.padding()
                                                     }
                                                 }.environmentObject(plantCollection)
-              
+
                 
                 SproutCast()
             }.alert(isPresented: $isAlertPresented) {
@@ -279,5 +271,7 @@ struct Home: View {
         }
     }
 }
+
+
 
 
